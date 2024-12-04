@@ -1,14 +1,16 @@
--- Table for sensor information
-CREATE TABLE IF NOT EXISTS SensorInfo (
+-- Table des infos Node
+CREATE TABLE Nodes (
     NodeID INT(16) PRIMARY KEY,
     Location VARCHAR(16)
 );
 
--- Table for sensor measurement data
-CREATE TABLE IF NOT EXISTS Data (
-    timestamp TEXT,        -- a ajouter sur l'UML apres la presentation
+-- Table des Data
+CREATE TABLE Data (
+    TimeStamp VARCHAR(32), 
     NodeID INT(16),
     MesureCapteur VARCHAR(255),
     Status VARCHAR(16),
-    FOREIGN KEY (NodeID) REFERENCES SensorInfo(NodeID)
+    FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID)
 );
+
+       -- timestamp a ajouter sur l'UML apres la presentation
