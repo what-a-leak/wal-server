@@ -1,7 +1,6 @@
 import sqlite3
 import paho.mqtt.client as mqtt
 import json
-import time
 
 # Enregistre les données dans la base
 def save_data(node_id, mesure, status):
@@ -18,6 +17,31 @@ def give_status(value):
         return 0
     else:
         return 1
+    
+# Fonction generant le fichier JSON a partir de la table Datas
+def export_to_json():
+    conn = sqlite3.connect("wal_database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM Data")
+    rows = cursor.fetchall()
+    # Cree liste de dictionnaires JSON
+    data_list = []
+    for row in rows:
+        data_dict = {
+            "NodeID": row[0],
+            "MesureCapteur": row[1],
+            "Status": row[2],
+            "TimeStamp": row[3],
+            "Batterie": row[4]
+            
+        }
+        data_list.append(data_dict)
+    # Save dans fichier JSON
+    with open("sensor_data.json", "w") as json_file:
+        json.dump(data_list, json_file, indent=4)
+    
+    conn.close()
 
 # Réception des messages MQTT
 def on_message(client, userdata, message):
@@ -26,11 +50,13 @@ def on_message(client, userdata, message):
      mesure = data["value"]
      status = give_status(mesure)
      timestamp = data["timestamp"]
-     batterie = data["status"]     
+     batterie = data["status"]
+     
 
-    # Attribue un statut et sauvegarde
+    # Attribue un statut et sauvegarde json
      print("message recu !!!" + timestamp)
      save_data(node_id, mesure, status,timestamp,batterie)
+     export_to_json()
 
 # Configuration MQTT
 MQTT_BROKER = "localhost"  
