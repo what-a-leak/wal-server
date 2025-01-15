@@ -2,10 +2,10 @@ import paho.mqtt.client as mqtt
 import json
 
 # Configuration
-MQTT_BROKER = "90.89.133.173"
+MQTT_BROKER = ""
 MQTT_PORT = 1883
-MQTT_USERNAME = "wal"
-MQTT_PASSWORD = "walwal"
+MQTT_USERNAME = ""
+MQTT_PASSWORD = ""
 MQTT_TOPIC = "sensors/data"
 
 # Exemple de données
