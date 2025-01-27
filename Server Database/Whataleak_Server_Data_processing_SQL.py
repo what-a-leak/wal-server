@@ -40,17 +40,29 @@ def generate_json_db():
 
 # Réception des messages MQTT
 def on_message(client, userdata, message):
-     data = json.loads(message.payload.decode())
-     node_id = data["node_id"]
-     mesure = data["mesure"]
-     status = give_status(mesure)
-     timestamp = data["timestamp"]
-     batterie = data["batterie"]
-     temperature = data["temperature"]     
+    try:
+        data = json.loads(message.payload.decode())
+        node_id = data["node_id"]
+        mesure = data["mesure"]
+        status = give_status(mesure)
+        timestamp = data["timestamp"]
+        batterie = data["batterie"]
+        temperature = data["temperature"]     
 
-    # Attribue un statut et sauvegarde
-     print("message recu !!!" + timestamp)
-     save_data(node_id, mesure, status, timestamp, batterie, temperature)
+        # Attribue un statut et sauvegarde
+        print("New MQTT Message Received:\n"
+            "Node ID: %d, Timestamp: %d, Measure: %s, Status: %s, Batterie: %d, Temperature: %d" 
+            % (node_id, timestamp, mesure, status, batterie, temperature))
+        save_data(node_id, mesure, status, timestamp, batterie, temperature)
+    except:
+        print("Message format invalid.")
+
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to the MQTT Broker successfully!")
+    else:
+        print(f"Could not connect to the MQTT Broker: Verify configuration. ({rc})")
+        exit(rc)
 
 # Configuration MQTT
 MQTT_BROKER = "localhost"  
@@ -65,7 +77,8 @@ client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 client.connect(MQTT_BROKER, MQTT_PORT)
 client.subscribe(MQTT_TOPIC)
 client.on_message = on_message
+client.on_connect = on_connect
 
 # Boucle pour écouter les messages
-print("En attente de messages MQTT...")
+print("Listening for MQTT messages...")
 client.loop_forever()
