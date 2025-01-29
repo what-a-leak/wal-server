@@ -1,7 +1,7 @@
 import sqlite3
 import paho.mqtt.client as mqtt
 import json
-import time
+from datetime import datetime
 
 # Enregistre les données dans la base
 def save_data(node_id, mesure, status, timestamp, batterie, temperature):
@@ -41,20 +41,23 @@ def generate_json_db():
 # Réception des messages MQTT
 def on_message(client, userdata, message):
     try:
-        data = json.loads(message.payload.decode())
+        raw_payload = message.payload.decode()
+        data = json.loads(raw_payload)
         node_id = data["node_id"]
         mesure = data["mesure"]
         status = give_status(mesure)
-        timestamp = data["timestamp"]
+        now = datetime.now()
+        timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
         batterie = data["batterie"]
         temperature = data["temperature"]     
 
         # Attribue un statut et sauvegarde
         print("New MQTT Message Received:\n"
-            "Node ID: %d, Timestamp: %d, Measure: %s, Status: %s, Batterie: %d, Temperature: %d" 
+            "Node ID: %d, Timestamp: %s, Measure: %s, Status: %s, Batterie: %d, Temperature: %d" 
             % (node_id, timestamp, mesure, status, batterie, temperature))
         save_data(node_id, mesure, status, timestamp, batterie, temperature)
     except:
+        print("Raw Payload Received:", raw_payload)
         print("Message format invalid.")
 
 def on_connect(client, userdata, flags, rc):
