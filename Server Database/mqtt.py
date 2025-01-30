@@ -16,7 +16,7 @@ def save_data(node_id, mesure, status, timestamp, batterie, temperature):
 
 # Attribue un statut en fonction de la valeur
 def give_status(value):
-    if value < 10:
+    if value < 140:
         return "0"
     else:
         return "1"
@@ -45,7 +45,8 @@ def on_message(client, userdata, message):
         data = json.loads(raw_payload)
         node_id = data["node_id"]
         mesure = data["mesure"]
-        status = give_status(mesure)
+        status = data["status"]
+	#status = give_status(mesure)
         now = datetime.now()
         timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
         batterie = data["batterie"]
@@ -70,8 +71,8 @@ def on_connect(client, userdata, flags, rc):
 # Configuration MQTT
 MQTT_BROKER = "localhost"  
 MQTT_PORT = 1883
-MQTT_USERNAME = ""  
-MQTT_PASSWORD = ""  
+MQTT_USERNAME = "wal"  
+MQTT_PASSWORD = "walwal"  
 MQTT_TOPIC = "sensors/data"
 
 # Client MQTT
